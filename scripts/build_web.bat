@@ -6,7 +6,7 @@ echo ========================================================
 
 set BACKEND_URL=%1
 if "%BACKEND_URL%"=="" (
-    set /p BACKEND_URL="Enter production backend base URL (e.g. https://your-backend.onrender.com): "
+    set /p BACKEND_URL="Enter production backend base URL (e.g. https://your-backend.up.railway.app): "
 )
 
 cd ..\ai_fitness_app
