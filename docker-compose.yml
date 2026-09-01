@@ -1,0 +1,102 @@
+# ==============================================================
+# Docker Compose - AI Fitness Platform Production Stack
+# ==============================================================
+
+version: '3.8'
+
+services:
+  # ------------------------------------------------------------
+  # MySQL Database
+  # ------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: fitness_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ai_fitness_platform}
+      MYSQL_USER: ${MYSQL_USER:-fitness_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fitness_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./SQL file.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fitness_network
+
+  # ------------------------------------------------------------
+  # Spring Boot Monolith Backend
+  # ------------------------------------------------------------
+  backend:
+    build:
+      context: ./ai-fitness-Backend
+      dockerfile: Dockerfile
+    container_name: fitness_backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      cv-service:
+        condition: service_started
+      ai-agent:
+        condition: service_started
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-ai_fitness_platform}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${MYSQL_USER:-fitness_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-fitness_pass}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-qwen/qwen3.8-27b}
+      JWT_SECRET: ${JWT_SECRET:-4b1f63e9f45d8b8a7b9e8b4562c1d4e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      CV_BASE_URL: http://cv-service:5000
+      AGENT_BASE_URL: http://ai-agent:8000
+    ports:
+      - "8080:8080"
+    networks:
+      - fitness_network
+
+  # ------------------------------------------------------------
+  # Python AI Agent Microservice
+  # ------------------------------------------------------------
+  ai-agent:
+    build:
+      context: ./ai-agent
+      dockerfile: Dockerfile
+    container_name: fitness_agent
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-qwen/qwen3.8-27b}
+    ports:
+      - "8000:8000"
+    networks:
+      - fitness_network
+
+  # ------------------------------------------------------------
+  # Python CV Exercise Analysis Microservice
+  # ------------------------------------------------------------
+  cv-service:
+    build:
+      context: ./cv-exercise-analysis
+      dockerfile: Dockerfile
+    container_name: fitness_cv
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - fitness_network
+
+volumes:
+  mysql_data:
+
+networks:
+  fitness_network:
+    driver: bridge
+

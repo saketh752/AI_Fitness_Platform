@@ -1,0 +1,32 @@
+package com.aifitness.form_analysis;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.aifitness.common.ApiResponse;
+import com.aifitness.form_analysis.dto.FormAnalysisResponse;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/form-analysis")
+@RequiredArgsConstructor
+public class FormAnalysisController {
+
+    private final FormAnalysisService formAnalysisService;
+
+    @PostMapping("/analyze")
+    public ResponseEntity<ApiResponse<FormAnalysisResponse>> analyze(
+            @RequestParam("exerciseCode") String exerciseCode,
+            @RequestParam("video") MultipartFile video,
+            @AuthenticationPrincipal Long userId) { // Assuming userId is parsed from JWT to context
+
+        FormAnalysisResponse response = formAnalysisService.analyzeForm(userId, exerciseCode, video);
+        return ResponseEntity.ok(ApiResponse.success(response, "Analysis complete"));
+    }
+}

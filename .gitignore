@@ -1,0 +1,79 @@
+# ==========================================
+# Root Git Ignore - AI Fitness Platform
+# ==========================================
+
+# Environment variables and secrets
+.env
+.env.*
+.env.local
+.env.production
+.env.staging
+!.env.example
+!.env.production.example
+credentials.json
+key.properties
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Java & Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+ai_fitness_app/build/
+ai_fitness_app/.dart_tool/
+ai_fitness_app/.pub-cache/
+
+# IDE and Editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+
+# OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Nn]anorc
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+startup-error.txt
+
+# Media & Archives
+*.zip
+output/*
+videos/*
+!videos/.gitkeep
+!output/.gitkeep
+

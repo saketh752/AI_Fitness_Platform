@@ -1,0 +1,88 @@
+# ==============================================================
+# Render Blueprint (Infrastructure as Code) - AI Fitness Platform
+# Docs: https://render.com/docs/blueprint-spec
+# ==============================================================
+
+services:
+  # ------------------------------------------------------------
+  # 1. Spring Boot Monolith Backend
+  # ------------------------------------------------------------
+  - type: web
+    name: ai-fitness-backend
+    env: docker
+    dockerfilePath: ./ai-fitness-Backend/Dockerfile
+    dockerContext: ./ai-fitness-Backend
+    plan: standard
+    healthCheckPath: /api/v1/auth/login
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_URL
+        fromDatabase:
+          name: ai-fitness-mysql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ai-fitness-mysql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ai-fitness-mysql
+          property: password
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: qwen/qwen3.8-27b
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: "86400000"
+      - key: CV_BASE_URL
+        fromService:
+          type: web
+          name: cv-exercise-analysis
+          property: host
+      - key: AGENT_BASE_URL
+        fromService:
+          type: web
+          name: ai-fitness-agent
+          property: host
+
+  # ------------------------------------------------------------
+  # 2. Python AI Agent Microservice
+  # ------------------------------------------------------------
+  - type: web
+    name: ai-fitness-agent
+    env: docker
+    dockerfilePath: ./ai-agent/Dockerfile
+    dockerContext: ./ai-agent
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: qwen/qwen3.8-27b
+
+  # ------------------------------------------------------------
+  # 3. Python CV Exercise Analysis Microservice
+  # ------------------------------------------------------------
+  - type: web
+    name: cv-exercise-analysis
+    env: docker
+    dockerfilePath: ./cv-exercise-analysis/Dockerfile
+    dockerContext: ./cv-exercise-analysis
+    plan: standard
+    healthCheckPath: /health
+
+databases:
+  # ------------------------------------------------------------
+  # Managed MySQL Database
+  # ------------------------------------------------------------
+  - name: ai-fitness-mysql
+    databaseName: ai_fitness_platform
+    user: fitness_admin
+    plan: starter
+

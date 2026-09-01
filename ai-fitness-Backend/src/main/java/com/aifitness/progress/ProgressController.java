@@ -1,0 +1,66 @@
+package com.aifitness.progress;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.aifitness.common.ApiResponse;
+import com.aifitness.progress.dto.ProgressSummary;
+import com.aifitness.progress.dto.WeightLogDto;
+import com.aifitness.user.User;
+import com.aifitness.user.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/progress")
+@RequiredArgsConstructor
+public class ProgressController {
+
+    private final ProgressService progressService;
+    private final UserRepository userRepository;
+
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponse<ProgressSummary>> getSummary() {
+        Long userId = getAuthenticatedUserId();
+        ProgressSummary summary = progressService.getSummary(userId);
+        return ResponseEntity.ok(ApiResponse.success(summary, "Progress summary retrieved"));
+    }
+
+    @PostMapping("/log-weight")
+    public ResponseEntity<ApiResponse<WeightLogDto>> logWeight(@RequestBody WeightLogDto request) {
+        Long userId = getAuthenticatedUserId();
+        WeightLogDto logged = progressService.logWeight(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(logged, "Weight logged successfully"));
+    }
+
+    @GetMapping("/weight-history")
+    public ResponseEntity<ApiResponse<List<WeightLogDto>>> getWeightHistory() {
+        Long userId = getAuthenticatedUserId();
+        List<WeightLogDto> history = progressService.getWeightHistory(userId);
+        return ResponseEntity.ok(ApiResponse.success(history, "Weight history retrieved"));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<List<Progress>>> getHistory() {
+        Long userId = getAuthenticatedUserId();
+        List<Progress> history = progressService.getHistory(userId);
+        return ResponseEntity.ok(ApiResponse.success(history, "Progress history retrieved"));
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = ((UserDetails) auth.getPrincipal()).getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getId();
+    }
+}
