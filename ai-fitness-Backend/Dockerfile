@@ -28,8 +28,8 @@ USER appuser
 # Copy executable jar from builder
 COPY --from=builder /app/target/*.jar app.jar
 
-ENV PORT=8080
-EXPOSE 8080
+ENV PORT=7860
+EXPOSE 7860
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Dserver.port=${PORT:-7860} -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
 

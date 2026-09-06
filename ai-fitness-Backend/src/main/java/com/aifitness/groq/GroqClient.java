@@ -40,7 +40,7 @@ public class GroqClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "{}";
+        return "I'm having a brief moment connecting to my coaching brain. Stay hydrated, keep pushing through your session, and ask me again shortly!";
     }
 
     @Data
