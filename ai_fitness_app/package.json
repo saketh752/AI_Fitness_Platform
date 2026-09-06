@@ -1,0 +1,8 @@
+﻿{
+  "name": "ai-fitness-frontend",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "build": "if [ ! -d \"_flutter\" ]; then git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter; fi && ./_flutter/bin/flutter build web --release --dart-define=API_BASE_URL=https://ai-fitness-backend-0klk.onrender.com"
+  }
+}

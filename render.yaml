@@ -44,3 +44,19 @@ services:
     dockerContext: ./cv-exercise-analysis
     plan: free
     healthCheckPath: /health
+
+  # ------------------------------------------------------------
+  # 3. Flutter Web Frontend (Free Static Site)
+  # ------------------------------------------------------------
+  - type: web
+    name: ai-fitness-frontend
+    runtime: static
+    plan: free
+    rootDir: ai_fitness_app
+    buildCommand: git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter && ./_flutter/bin/flutter build web --release --dart-define=API_BASE_URL=https://ai-fitness-backend-0klk.onrender.com
+    staticPublishPath: ./build/web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
