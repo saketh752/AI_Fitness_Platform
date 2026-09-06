@@ -32,10 +32,7 @@ services:
       - key: JWT_EXPIRATION
         value: "86400000"
       - key: CV_BASE_URL
-        fromService:
-          type: web
-          name: cv-exercise-analysis
-          property: host
+        value: https://cv-exercise-analysis.onrender.com
 
   # ------------------------------------------------------------
   # 2. Python CV Exercise Analysis Microservice (Free Plan)
