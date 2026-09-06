@@ -9,12 +9,8 @@ class AppConfig {
     const envUrl = String.fromEnvironment('API_BASE_URL');
     if (envUrl.isNotEmpty) return envUrl;
 
-    if (kIsWeb) return 'http://localhost:8080';
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      // 10.0.2.2 is the Android emulator loopback to host localhost
-      return 'http://10.0.2.2:8080';
-    }
-    return 'http://localhost:8080';
+    // Default to production Render cloud backend
+    return 'https://ai-fitness-backend-0klk.onrender.com';
   }
 
   static String _apiBaseUrl = defaultBaseUrl;
