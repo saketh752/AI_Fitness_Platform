@@ -6,10 +6,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies for OpenCV and MediaPipe
+# Install system dependencies for OpenCV and MediaPipe (including audio/video decoders)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
+    libasound2 \
+    libportaudio2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up non-root user for security
@@ -32,5 +34,5 @@ USER user
 # Expose cloud container port
 EXPOSE 7860
 
-# Run FastAPI app with dynamic port binding
+# Run FastAPI app with dynamic port binding (compatible with Render $PORT and HF Spaces)
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860} --workers 2"]
