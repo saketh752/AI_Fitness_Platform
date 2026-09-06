@@ -25,6 +25,14 @@ public class PythonCvClient {
 
     public FormAnalysisResponse callCvService(String videoUrl, String exerciseCode) {
         String url = baseUrl + "/api/analyze";
+        String cleanBaseUrl = (baseUrl != null) ? baseUrl.trim() : "http://localhost:5000";
+        if (!cleanBaseUrl.startsWith("http://") && !cleanBaseUrl.startsWith("https://")) {
+            cleanBaseUrl = "http://" + cleanBaseUrl;
+        }
+        if (cleanBaseUrl.endsWith("/")) {
+            cleanBaseUrl = cleanBaseUrl.substring(0, cleanBaseUrl.length() - 1);
+        }
+        String url = cleanBaseUrl + "/api/analyze";
         log.info("Sending request to Python CV service at {} with videoUrl: {}, exerciseCode: {}", url, videoUrl, exerciseCode);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
