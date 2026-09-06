@@ -29,7 +29,6 @@ public class PythonCvClient {
     private String baseUrl;
 
     public FormAnalysisResponse callCvService(String videoUrl, String exerciseCode) {
-        String url = baseUrl + "/api/analyze";
         String cleanBaseUrl = (baseUrl != null) ? baseUrl.trim() : "http://localhost:5000";
         if (!cleanBaseUrl.startsWith("http://") && !cleanBaseUrl.startsWith("https://")) {
             cleanBaseUrl = "http://" + cleanBaseUrl;
