@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -16,6 +17,7 @@ class ApiException implements Exception {
 
 class ApiClient {
   final http.Client _client;
+  static const Duration _timeout = Duration(seconds: 45);
 
   ApiClient({http.Client? client}) : _client = client ?? http.Client();
 
@@ -47,10 +49,12 @@ class ApiClient {
       final uri = _buildUri(path, queryParams);
       final response = await _client
           .get(uri, headers: _buildHeaders(token: token))
-          .timeout(const Duration(seconds: 15));
+          .timeout(_timeout);
       return _processResponse(response);
     } on SocketException {
       throw ApiException('Unable to connect to the server. Please check your network.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. The cloud server may be waking up—please try again.');
     } on http.ClientException catch (e) {
       throw ApiException('Network error: ${e.message}');
     } catch (e) {
@@ -72,10 +76,12 @@ class ApiClient {
             headers: _buildHeaders(token: token),
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(_timeout);
       return _processResponse(response);
     } on SocketException {
       throw ApiException('Unable to connect to the server. Please check your network.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. The cloud server may be waking up—please try again.');
     } on http.ClientException catch (e) {
       throw ApiException('Network error: ${e.message}');
     } catch (e) {
@@ -97,10 +103,12 @@ class ApiClient {
             headers: _buildHeaders(token: token),
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(_timeout);
       return _processResponse(response);
     } on SocketException {
       throw ApiException('Unable to connect to the server. Please check your network.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. The cloud server may be waking up—please try again.');
     } on http.ClientException catch (e) {
       throw ApiException('Network error: ${e.message}');
     } catch (e) {
@@ -117,10 +125,12 @@ class ApiClient {
       final uri = _buildUri(path);
       final response = await _client
           .delete(uri, headers: _buildHeaders(token: token))
-          .timeout(const Duration(seconds: 15));
+          .timeout(_timeout);
       return _processResponse(response);
     } on SocketException {
       throw ApiException('Unable to connect to the server. Please check your network.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. The cloud server may be waking up—please try again.');
     } on http.ClientException catch (e) {
       throw ApiException('Network error: ${e.message}');
     } catch (e) {
